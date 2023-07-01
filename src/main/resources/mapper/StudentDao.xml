@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqdx.springboot.dao.StudentDao">
+
+    <resultMap type="com.cqdx.springboot.entity.Student" id="StudentMap">
+        <result property="studentId" column="student_id" jdbcType="INTEGER"/>
+        <result property="studentName" column="student_name" jdbcType="VARCHAR"/>
+        <result property="studentBirth" column="student_birth" jdbcType="TIMESTAMP"/>
+        <result property="studentAddress" column="student_address" jdbcType="VARCHAR"/>
+        <result property="studentNo" column="student_no" jdbcType="INTEGER"/>
+        <result property="gradeId" column="grade_id" jdbcType="INTEGER"/>
+        <result property="studentAge" column="student_age" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="StudentMap">
+        select
+          student_id, student_name, student_birth, student_address, student_no, grade_id, student_age
+        from student
+        where student_id = #{studentId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="StudentMap">
+        select
+          student_id, student_name, student_birth, student_address, student_no, grade_id, student_age
+        from student
+        <where>
+            <if test="studentId != null">
+                and student_id = #{studentId}
+            </if>
+            <if test="studentName != null and studentName != ''">
+                and student_name like concat("%",#{studentName},"%")
+            </if>
+            <if test="studentBirth != null">
+                and student_birth = #{studentBirth}
+            </if>
+            <if test="studentAddress != null and studentAddress != ''">
+                and student_address = #{studentAddress}
+            </if>
+            <if test="studentNo != null">
+                and student_no = #{studentNo}
+            </if>
+            <if test="gradeId != null">
+                and grade_id = #{gradeId}
+            </if>
+            <if test="studentAge != null">
+                and student_age = #{studentAge}
+            </if>
+        </where>
+        order by student_id desc
+        limit #{page}, #{limit}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from student
+        <where>
+            <if test="studentId != null">
+                and student_id = #{studentId}
+            </if>
+            <if test="studentName != null and studentName != ''">
+                and student_name = #{studentName}
+            </if>
+            <if test="studentBirth != null">
+                and student_birth = #{studentBirth}
+            </if>
+            <if test="studentAddress != null and studentAddress != ''">
+                and student_address = #{studentAddress}
+            </if>
+            <if test="studentNo != null">
+                and student_no = #{studentNo}
+            </if>
+            <if test="gradeId != null">
+                and grade_id = #{gradeId}
+            </if>
+            <if test="studentAge != null">
+                and student_age = #{studentAge}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="studentId" useGeneratedKeys="true">
+        insert into student(student_name, student_birth, student_address, student_no, grade_id, student_age)
+        values (#{studentName}, #{studentBirth}, #{studentAddress}, #{studentNo}, #{gradeId}, #{studentAge})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="studentId" useGeneratedKeys="true">
+        insert into student(student_name, student_birth, student_address, student_no, grade_id, student_age)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.studentName}, #{entity.studentBirth}, #{entity.studentAddress}, #{entity.studentNo}, #{entity.gradeId}, #{entity.studentAge})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="studentId" useGeneratedKeys="true">
+        insert into student(student_name, student_birth, student_address, student_no, grade_id, student_age)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.studentName}, #{entity.studentBirth}, #{entity.studentAddress}, #{entity.studentNo}, #{entity.gradeId}, #{entity.studentAge})
+        </foreach>
+        on duplicate key update
+        student_name = values(student_name),
+        student_birth = values(student_birth),
+        student_address = values(student_address),
+        student_no = values(student_no),
+        grade_id = values(grade_id),
+        student_age = values(student_age)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update student
+        <set>
+            <if test="studentName != null and studentName != ''">
+                student_name = #{studentName},
+            </if>
+            <if test="studentBirth != null">
+                student_birth = #{studentBirth},
+            </if>
+            <if test="studentAddress != null and studentAddress != ''">
+                student_address = #{studentAddress},
+            </if>
+            <if test="studentNo != null">
+                student_no = #{studentNo},
+            </if>
+            <if test="gradeId != null">
+                grade_id = #{gradeId},
+            </if>
+            <if test="studentAge != null">
+                student_age = #{studentAge},
+            </if>
+        </set>
+        where student_id = #{studentId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from student where student_id = #{studentId}
+    </delete>
+
+</mapper>
+
